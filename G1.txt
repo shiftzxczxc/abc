@@ -1,0 +1,109 @@
+import { useState } from "react";
+
+function App() {
+  const [letter, setLetter] = useState("");
+  const [meals, setMeals] = useState([]);
+  const [selectedMeal, setSelectedMeal] = useState(null);
+
+  async function searchMeals() {
+    const url = `https://www.themealdb.com/api/json/v1/1/search.php?f=${letter}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    setMeals(data.meals || []);
+    setSelectedMeal(null);
+  }
+
+  async function getDetails(id) {
+    const url = `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    setSelectedMeal(data.meals[0]);
+  }
+
+  return (
+    <div>
+      <h1>Meal Explorer</h1>
+
+      <input
+        type="text"
+        placeholder="Enter first letter e.g. a"
+        value={letter}
+        onChange={(e) => setLetter(e.target.value)}
+      />
+
+      <button onClick={searchMeals}>Find</button>
+
+      <hr />
+
+      <h2>Meal List</h2>
+
+      {meals.map((meal) => (
+        <div key={meal.idMeal}>
+          <img src={meal.strMealThumb} width="150" />
+          <h3>{meal.strMeal}</h3>
+
+          <button onClick={() => getDetails(meal.idMeal)}>
+            View Details
+          </button>
+
+          <hr />
+        </div>
+      ))}
+
+      {selectedMeal && (
+        <div>
+          <h2>Meal Details</h2>
+
+          <h3>{selectedMeal.strMeal}</h3>
+
+          <img src={selectedMeal.strMealThumb} width="300" />
+
+          <p>
+            <b>Category:</b> {selectedMeal.strCategory}
+          </p>
+
+          <p>
+            <b>Area:</b> {selectedMeal.strArea}
+          </p>
+
+          <p>
+            <b>Instructions:</b>
+          </p>
+
+          <p>{selectedMeal.strInstructions}</p>
+
+          <p>
+            <b>YouTube:</b>{" "}
+            <a href={selectedMeal.strYoutube} target="_blank">
+              Watch Video
+            </a>
+          </p>
+
+          <h3>Ingredients</h3>
+
+          <p>
+            {selectedMeal.strIngredient1} - {selectedMeal.strMeasure1}
+          </p>
+
+          <p>
+            {selectedMeal.strIngredient2} - {selectedMeal.strMeasure2}
+          </p>
+
+          <p>
+            {selectedMeal.strIngredient3} - {selectedMeal.strMeasure3}
+          </p>
+
+          <p>
+            {selectedMeal.strIngredient4} - {selectedMeal.strMeasure4}
+          </p>
+
+          <p>
+            {selectedMeal.strIngredient5} - {selectedMeal.strMeasure5}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;
