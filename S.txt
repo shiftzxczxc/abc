@@ -1,0 +1,143 @@
+import { useEffect, useState } from "react";
+
+function App() {
+  const [page, setPage] = useState("categories");
+  const [categories, setCategories] = useState([]);
+  const [meals, setMeals] = useState([]);
+  const [meal, setMeal] = useState(null);
+
+  useEffect(() => {
+    fetch("https://www.themealdb.com/api/json/v1/1/categories.php")
+      .then(res => res.json())
+      .then(data => setCategories(data.categories));
+  }, []);
+
+  function showMeals(category) {
+    fetch(
+      `https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`
+    )
+      .then(res => res.json())
+      .then(data => {
+        setMeals(data.meals);
+        setPage("meals");
+      });
+  }
+
+  function showDetails(id) {
+    fetch(
+      `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`
+    )
+      .then(res => res.json())
+      .then(data => {
+        setMeal(data.meals[0]);
+        setPage("details");
+      });
+  }
+
+  if (page === "categories") {
+    return (
+      <div>
+        <h1>Meal Categories</h1>
+
+        {categories.map(category => (
+          <div key={category.idCategory}>
+            <img
+              src={category.strCategoryThumb}
+              width="150"
+            />
+
+            <h2>{category.strCategory}</h2>
+
+            <button
+              onClick={() => showMeals(category.strCategory)}
+            >
+              View Meals
+            </button>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (page === "meals") {
+    return (
+      <div>
+        <button onClick={() => setPage("categories")}>
+          Back
+        </button>
+
+        <h1>Meals</h1>
+
+        {meals.map(item => (
+          <div key={item.idMeal}>
+            <img
+              src={item.strMealThumb}
+              width="150"
+            />
+
+            <h2>{item.strMeal}</h2>
+
+            <button
+              onClick={() => showDetails(item.idMeal)}
+            >
+              View Details
+            </button>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (page === "details") {
+    return (
+      <div>
+        <button onClick={() => setPage("meals")}>
+          Back
+        </button>
+
+        <h1>{meal.strMeal}</h1>
+
+        <img
+          src={meal.strMealThumb}
+          width="300"
+        />
+
+        <p>
+          <b>Category:</b> {meal.strCategory}
+        </p>
+
+        <p>
+          <b>Area:</b> {meal.strArea}
+        </p>
+
+        <h3>Instructions</h3>
+
+        <p>{meal.strInstructions}</p>
+
+        <h3>Ingredients</h3>
+
+        <p>
+          {meal.strIngredient1} - {meal.strMeasure1}
+        </p>
+
+        <p>
+          {meal.strIngredient2} - {meal.strMeasure2}
+        </p>
+
+        <p>
+          {meal.strIngredient3} - {meal.strMeasure3}
+        </p>
+
+        <p>
+          {meal.strIngredient4} - {meal.strMeasure4}
+        </p>
+
+        <p>
+          {meal.strIngredient5} - {meal.strMeasure5}
+        </p>
+      </div>
+    );
+  }
+}
+
+export default App;
